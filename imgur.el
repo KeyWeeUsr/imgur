@@ -248,5 +248,26 @@ Optional argument ARGS allows specifying these keys:
 * :session - (string/`imgur-default-session-name') session name"
   (ignore base client-id client-secret type file title description args))
 
+(defun imgur-upload-interactive-with-session
+    (type file title description session)
+  "Upload resource TYPE to Imgur using passed SESSION.
+Argument TYPE Resource type from `imgur-allowed-types'.
+Argument FILE Path to resource.
+Argument TITLE Title for resource on Imgur.
+Argument DESCRIPTION Description for resource on Imgur."
+  (interactive "SType: \nfFile: \nsTitle: \nsDescription: \nsSession: ")
+
+  (if (not (alist-get (intern session) imgur-creds))
+      (progn
+        (message "%s: (%s) Credentials missing, obtaining"
+                 imgur-log-prefix session)
+        (call-interactively #'imgur-authorize-interactive))
+    (let ((creds (alist-get (intern session) imgur-creds)))
+      (imgur-upload
+       (alist-get 'base creds)
+       (alist-get 'client-id creds)
+       (alist-get 'client-secret creds)
+       type file title description :session session))))
+
 (provide 'imgur)
 ;;; imgur.el ends here
