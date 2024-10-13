@@ -278,7 +278,18 @@ Optional argument ARGS allows specifying these keys:
 
     (unless (member type imgur-allowed-types)
       (user-error "Unsupported type '%s' specified (%S)"
-                  type imgur-allowed-types))))
+                  type imgur-allowed-types))
+
+    (let* ((url-request-method "POST")
+           (url-show-status nil)
+           (url-request-extra-headers
+            `(("Authorization" . ,(format
+                                   "Client-ID %s"
+                                   (encode-coding-string client-id 'utf-8)))
+              ("Content-Type" . ,(format "multipart/form-data; boundary=%s"
+                                         "boundary")))))
+      (ignore url-request-method url-show-status url-request-extra-headers)
+      (url-retrieve (format "%s/3/image" base)))))
 
 (defun imgur-upload-interactive-with-session
     (type file title description session)
