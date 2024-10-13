@@ -42,12 +42,26 @@
   "Credentials for all sessions in nested alists.")
 
 ;; public funcs
+(defun imgur-authorize (base client-id client-secret &rest args)
+  "Authorize the client against BASE for SESSION.
+Argument CLIENT-ID Imgur application client ID.
+Argument CLIENT-SECRET Imgur application client secret.
+
+Optional argument ARGS allows specifying these keys:
+* :success - (function/nil) called on successful run
+* :fail - (function/nil) called on failed run
+* :session - (string/`imgur-default-session-name') session name"
+  (let ((success (plist-get args :success))
+        (fail (plist-get args :fail))
+        (session (or (plist-get args :session) imgur-default-session-name)))))
+
 (defun imgur-authorize-interactive-with-session
     (base client-id client-secret session)
   "Authorize the client against BASE for SESSION.
 Argument CLIENT-ID Imgur application client ID.
 Argument CLIENT-SECRET Imgur application client secret."
-  (interactive  "sURL base: \nsClient ID: \nsClient secret: \nsSession: "))
+  (interactive  "sURL base: \nsClient ID: \nsClient secret: \nsSession: ")
+  (imgur-authorize base client-id client-secret :session session))
 
 (defun imgur-authorize-interactive (base client-id client-secret)
   "Authorize the client against BASE using `imgur-default-session-name'.
