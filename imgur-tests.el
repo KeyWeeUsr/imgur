@@ -80,6 +80,26 @@
       (advice-remove 'make-network-process
                      (lambda (&rest r) (setq called t))))))
 
+(ert-deftest imgur-authorize-interactive-run-server ()
+  "Ask to open authorization page (and run server) when `imgur-creds' is nil."
+  (let (imgur-creds imgur-procs result asked server-launched browser-opened
+                    noninteractive)
+    (unwind-protect
+        (progn
+          (advice-add 'read-string :override (lambda (&rest r) (setq asked t)))
+          (advice-add 'make-network-process
+                      :override (lambda (&rest r) (setq server-launched t)))
+          (advice-add 'browse-url
+                      :override (lambda (&rest r) (setq browser-opened t)))
+          (imgur-authorize "base" "id" (lambda () (setq result "abc")) nil)
+          (should (and asked server-launched browser-opened
+                       (null imgur-creds) (null result))))
+      (advice-remove 'make-network-process
+                     (lambda (&rest r) (setq server-launched t)))
+      (advice-remove 'browse-url
+                     (lambda (&rest r) (setq browser-opened t)))
+      (advice-remove 'read-string (lambda (&rest r))))))
+
 (provide 'imgur-tests)
 
 ;;; imgur-tests.el ends here
