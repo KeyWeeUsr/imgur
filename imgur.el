@@ -280,5 +280,16 @@ Argument DESCRIPTION Description for resource on Imgur."
   (apply #'imgur-upload-interactive-with-session
          `(,type ,file ,title ,description ,imgur-default-session-name)))
 
+(defun imgur-upload-image-interactive (file title description)
+  "Upload image to Imgur using the default session.
+Argument TYPE Resource type from `imgur-allowed-types'.
+Argument FILE Path to resource.
+Argument TITLE Title for resource on Imgur.
+Argument DESCRIPTION Description for resource on Imgur."
+  (interactive "fFile: \nsTitle: \nsDescription: ")
+
+  (apply #'imgur-upload-interactive
+         `(image ,file ,title ,description)))
+
 (provide 'imgur)
 ;;; imgur.el ends here
