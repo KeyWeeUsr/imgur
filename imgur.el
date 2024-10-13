@@ -120,6 +120,30 @@ Argument CLIENT-SECRET Imgur application client secret."
      (condition-case nil (delete-process proc) (error t))))
 
 ;; public funcs
+(defun imgur-reset (prefix)
+  "Reset all modifications and state to default.
+Argument PREFIX Force cleaning, drop references if can't clean."
+  (interactive "P")
+  (dolist (session imgur-procs)
+    (condition-case nil
+        (progn
+          (delete-process (alist-get (car session) imgur-procs))
+          (setf (alist-get (car session) imgur-procs) nil))
+      (error
+       (message "%s: Failed to close process: %s"
+                imgur-log-prefix (alist-get (car session) imgur-procs))
+       (when prefix
+         (message "%s: Dropping process reference: %s"
+                  imgur-log-prefix (alist-get (car session) imgur-procs))
+         (setf (alist-get (car session) imgur-procs) nil))))
+    (unless (alist-get (car session) imgur-procs)
+      (setq imgur-procs (delete session imgur-procs))))
+
+  (dolist (session imgur-creds)
+    (setf (alist-get (car session) imgur-creds) nil)
+    (unless (alist-get (car session) imgur-creds)
+      (setq imgur-creds (delete session imgur-creds)))))
+
 (defun imgur-authorize (base client-id client-secret &rest args)
   "Authorize the client against BASE for SESSION.
 Argument CLIENT-ID Imgur application client ID.
