@@ -100,6 +100,26 @@
                      (lambda (&rest r) (setq browser-opened t)))
       (advice-remove 'read-string (lambda (&rest r))))))
 
+(ert-deftest imgur-upload-missing-or-empty-args ()
+  "Check for missing or empty args in upload func."
+  (dolist (args-result
+           `(((nil nil nil nil nil nil nil)
+              ,(format "Bad base (%s)" nil))
+             (("" nil nil nil nil nil nil)
+              ,(format "Bad base (%s)" ""))
+             (("base" nil nil nil nil nil nil)
+              ,(format "Bad client-id (%s)" nil))
+             (("base" "" nil nil nil nil nil)
+              ,(format "Bad client-id (%s)" ""))
+             (("base" "id" nil nil nil nil nil)
+              ,(format "Bad client-secret (%s)" nil))
+             (("base" "id" "" nil nil nil nil)
+              ,(format "Bad client-secret (%s)" ""))))
+    (condition-case err
+        (progn (apply #'imgur-upload (car args-result)) (should nil))
+      (user-error (should (string= (cadr args-result)
+                                   (error-message-string err)))))))
+
 (provide 'imgur-tests)
 
 ;;; imgur-tests.el ends here
