@@ -81,6 +81,10 @@ Optional argument ARGS allows specifying these keys:
     (if (alist-get (intern session) imgur-creds)
         (when success (funcall success))
 
+      (condition-case nil
+          (delete-process (get-process (format "imgur-authorize-server")))
+        (error nil))
+
       ;; TODO: allow multi-session
       ;; a) single port + route
       ;; b) multi-port + session-port/session-url pairing for redir URLs
