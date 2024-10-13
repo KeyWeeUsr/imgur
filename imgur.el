@@ -33,6 +33,13 @@
   :group 'communication)
 
 ;; public funcs
+(defun imgur-authorize-interactive-with-session
+    (base client-id client-secret session)
+  "Authorize the client against BASE for SESSION.
+Argument CLIENT-ID Imgur application client ID.
+Argument CLIENT-SECRET Imgur application client secret."
+  (interactive  "sURL base: \nsClient ID: \nsClient secret: \nsSession: "))
+
 (defun imgur-authorize-interactive (base client-id client-secret)
   (interactive  "sURL base: \nsClient ID: \nsClient secret: "))
 
