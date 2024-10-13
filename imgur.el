@@ -38,6 +38,12 @@
   :group 'imgur
   :type 'string)
 
+(defcustom imgur-log-prefix
+  "imgur"
+  "Log message prefix."
+  :group 'imgur
+  :type 'string)
+
 (defvar imgur-creds nil
   "Credentials for all sessions in nested alists.")
 
@@ -52,7 +58,7 @@ Argument CB Callback."
   `(lambda (proc state)
      (when (alist-get (intern ,session) imgur-creds)
        (message "%s: (%s) Credentials obtained, closing server"
-                "imgur" ,session)
+                imgur-log-prefix ,session)
        (condition-case nil
            (delete-process proc)
          (error t))
