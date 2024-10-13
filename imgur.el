@@ -46,6 +46,13 @@
   :group 'imgur
   :type 'string)
 
+;; TODO: why is "image" not in docs yet used in cURL and behaves like "file"?
+(defcustom imgur-allowed-types
+  '(file url base64 raw image)
+  "Allowed types for upload."
+  :group 'imgur
+  :type '(repeat symbol))
+
 (defvar imgur-creds nil
   "Credentials for all sessions in nested alists.")
 
@@ -223,6 +230,23 @@ Argument CLIENT-SECRET Imgur application client secret."
   (interactive  "sURL base: \nsClient ID: \nsClient secret: ")
   (apply #'imgur-authorize-interactive-with-session
          `(,base ,client-id ,client-secret ,imgur-default-session-name)))
+
+(defun imgur-upload
+    (base client-id client-secret type file title description &rest args)
+  "Upload resource to Imgur.
+Argument BASE URL base for API calls.
+Argument CLIENT-ID Imgur application client ID.
+Argument CLIENT-SECRET Imgur application client secret.
+Argument TYPE Resource type from `imgur-allowed-types'.
+Argument FILE Path to resource.
+Argument TITLE Title for resource on Imgur.
+Argument DESCRIPTION Description for resource on Imgur.
+
+Optional argument ARGS allows specifying these keys:
+* :success - (function/nil) called on successful run
+* :fail - (function/nil) called on failed run
+* :session - (string/`imgur-default-session-name') session name"
+  (ignore base client-id client-secret type file title description args))
 
 (provide 'imgur)
 ;;; imgur.el ends here
