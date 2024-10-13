@@ -32,5 +32,9 @@
   :group 'external
   :group 'communication)
 
+;; public funcs
+(defun imgur-authorize-interactive (base client-id client-secret)
+  (interactive  "sURL base: \nsClient ID: \nsClient secret: "))
+
 (provide 'imgur)
 ;;; imgur.el ends here
