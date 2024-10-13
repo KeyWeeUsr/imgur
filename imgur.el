@@ -249,8 +249,36 @@ Optional argument ARGS allows specifying these keys:
   (let ((success (plist-get args :success))
         (fail (plist-get args :fail))
         (session (or (plist-get args :session) imgur-default-session-name)))
-    (ignore base client-id client-secret type file title
-            description success fail session)))
+    (ignore file title description session)
+
+    (unless (or (functionp success) (null success))
+      (error "Optional :success must be a funcall-able"))
+    (unless (or (functionp fail) (null fail))
+      (error "Optional :fail must be a funcall-able"))
+
+    (when (or (null base) (eq 0 (length base)))
+      (let ((err (format "Bad base (%s)" base)))
+        (when fail (funcall fail err))
+        (user-error err)))
+
+    (when (or (null client-id) (eq 0 (length client-id)))
+      (let ((err (format "Bad client-id (%s)" client-id)))
+        (when fail (funcall fail err))
+        (user-error err)))
+
+    (when (or (null client-secret) (eq 0 (length client-secret)))
+      (let ((err (format "Bad client-secret (%s)" client-secret)))
+        (when fail (funcall fail err))
+        (user-error err)))
+
+    (when (or (null type) (not (symbolp type)))
+      (let ((err (format "Bad type (%s)" type)))
+        (when fail (funcall fail err))
+        (user-error err)))
+
+    (unless (member type imgur-allowed-types)
+      (user-error "Unsupported type '%s' specified (%S)"
+                  type imgur-allowed-types))))
 
 (defun imgur-upload-interactive-with-session
     (type file title description session)
