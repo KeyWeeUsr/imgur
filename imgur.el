@@ -75,7 +75,8 @@ Optional argument ARGS allows specifying these keys:
         (when fail (funcall fail err))
         (user-error err)))
 
-    (ignore session)))
+    (if (alist-get (intern session) imgur-creds)
+        (when success (funcall success)))))
 
 (defun imgur-authorize-interactive-with-session
     (base client-id client-secret session)
