@@ -269,5 +269,16 @@ Argument DESCRIPTION Description for resource on Imgur."
        (alist-get 'client-secret creds)
        type file title description :session session))))
 
+(defun imgur-upload-interactive (type file title description)
+  "Upload resource TYPE to Imgur using the default session.
+Argument TYPE Resource type from `imgur-allowed-types'.
+Argument FILE Path to resource.
+Argument TITLE Title for resource on Imgur.
+Argument DESCRIPTION Description for resource on Imgur."
+  (interactive "SType: \nfFile: \nsTitle: \nsDescription: ")
+
+  (apply #'imgur-upload-interactive-with-session
+         `(,type ,file ,title ,description ,imgur-default-session-name)))
+
 (provide 'imgur)
 ;;; imgur.el ends here
