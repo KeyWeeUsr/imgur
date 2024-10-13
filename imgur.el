@@ -55,7 +55,7 @@
 ;; private/helper funcs
 (defun imgur--server-create-sentinel (session cb)
   "Sentinel for auth listener.
-Argument SESSION Session to store creds into `imgur-creds'.
+Argument SESSION Session to access creds in `imgur-creds'.
 Argument CB Callback."
   `(lambda (proc state)
      (when (alist-get (intern ,session) imgur-creds)
