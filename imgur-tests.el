@@ -65,6 +65,21 @@
         (advice-remove 'make-network-process
                        (lambda (&rest r) (setq server-launched t)))))))
 
+(ert-deftest imgur-authorize-noninteractive-run-server ()
+  "Run server without asking when `noninteractive' and `imgur-creds' is nil."
+  (let (imgur-creds imgur-procs (noninteractive t) result called)
+    (unwind-protect
+        (progn
+          (advice-add 'make-network-process
+                      :override (lambda (&rest r) (setq called t)))
+          (imgur-authorize "base" "id" "secret"
+                           :success (lambda () (setq result "abc")))
+          (should called)
+          (should-not imgur-creds)
+          (should-not result))
+      (advice-remove 'make-network-process
+                     (lambda (&rest r) (setq called t))))))
+
 (provide 'imgur-tests)
 
 ;;; imgur-tests.el ends here
