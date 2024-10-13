@@ -290,7 +290,12 @@ Optional argument ARGS allows specifying these keys:
               ("Content-Type" . ,(format "multipart/form-data; boundary=%s"
                                          boundary)))))
       (ignore url-request-method url-show-status url-request-extra-headers)
-      (url-retrieve (format "%s/3/image" base)))))
+      (url-retrieve
+       (format "%s/3/image" base)
+       (lambda (status)
+         (ignore status)
+         (message "raw: >%s<" (with-current-buffer (current-buffer)
+                                (buffer-string))))))))
 
 (defun imgur-upload-interactive-with-session
     (type file title description session)
