@@ -246,7 +246,11 @@ Optional argument ARGS allows specifying these keys:
 * :success - (function/nil) called on successful run
 * :fail - (function/nil) called on failed run
 * :session - (string/`imgur-default-session-name') session name"
-  (ignore base client-id client-secret type file title description args))
+  (let ((success (plist-get args :success))
+        (fail (plist-get args :fail))
+        (session (or (plist-get args :session) imgur-default-session-name)))
+    (ignore base client-id client-secret type file title
+            description success fail session)))
 
 (defun imgur-upload-interactive-with-session
     (type file title description session)
