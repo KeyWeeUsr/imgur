@@ -288,8 +288,10 @@ Optional argument ARGS allows specifying these keys:
                                    "Client-ID %s"
                                    (encode-coding-string client-id 'utf-8)))
               ("Content-Type" . ,(format "multipart/form-data; boundary=%s"
-                                         boundary)))))
-      (ignore url-request-method url-show-status url-request-extra-headers)
+                                         boundary))))
+           (url-request-data (with-temp-buffer (buffer-string))))
+      (ignore url-request-method url-show-status url-request-extra-headers
+              url-request-data)
       (url-retrieve
        (format "%s/3/image" base)
        (lambda (status)
