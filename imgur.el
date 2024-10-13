@@ -184,6 +184,9 @@ Optional argument ARGS allows specifying these keys:
           (delete-process (get-process (format "imgur-authorize-server")))
         (error nil))
 
+      (unless noninteractive
+        (read-string "Opening authorization website (press enter)..."))
+
       ;; TODO: allow multi-session
       ;; a) single port + route
       ;; b) multi-port + session-port/session-url pairing for redir URLs
