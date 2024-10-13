@@ -126,6 +126,13 @@ Argument CLIENT-SECRET Imgur application client secret."
                             ,(imgur--generate-body)) "\r\n")))
      (condition-case nil (delete-process proc) (error t))))
 
+(defun imgur--as-unibyte (string)
+  "Convert multibyte STRING to unibyte."
+  (if (boundp 'encode-coding-char)
+      (encode-coding-char string 'utf-8)
+    (with-no-warnings
+      (string-as-unibyte string))))
+
 ;; public funcs
 (defun imgur-reset (prefix)
   "Reset all modifications and state to default.
@@ -302,9 +309,33 @@ Optional argument ARGS allows specifying these keys:
                 (insert "\r\n")
                 (insert (format "%s\r\n"
                                 (url-hexify-string (car (cdr item))))))
+
+              ;; Multipart files
+              (insert (format "--%s\r\n" boundary))
+              (insert
+               (format (string-join '("Content-Disposition: form-data"
+                                      "name=\"%s\""
+                                      "filename=\"%s\"\r\n") "; ")
+                       "image"
+                       (file-name-nondirectory file)))
+              (insert "Content-Type: application/octet-stream\r\n")
+              ;; end section headers
+              (insert "\r\n")
+              ;; raw body
+              (insert (with-temp-buffer
+                        (insert-file-contents-literally file)
+                        (imgur--as-unibyte
+                         (buffer-substring-no-properties
+                          (point-min) (point-max)))))
+              ;; end body
+              (insert "\r\n")
+
               ;; Close multipart
               (insert (format "--%s--\r\n" boundary))
-              (buffer-string))))
+
+              ;; return value
+              (imgur--as-unibyte
+               (buffer-substring-no-properties (point-min) (point-max))))))
       (ignore url-request-method url-show-status url-request-extra-headers
               url-request-data)
       (url-retrieve
