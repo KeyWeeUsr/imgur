@@ -32,6 +32,15 @@
   :group 'external
   :group 'communication)
 
+(defcustom imgur-default-session-name
+  "default"
+  "Name used as an alist key for `imgur-creds'."
+  :group 'imgur
+  :type 'string)
+
+(defvar imgur-creds nil
+  "Credentials for all sessions in nested alists.")
+
 ;; public funcs
 (defun imgur-authorize-interactive-with-session
     (base client-id client-secret session)
@@ -41,7 +50,12 @@ Argument CLIENT-SECRET Imgur application client secret."
   (interactive  "sURL base: \nsClient ID: \nsClient secret: \nsSession: "))
 
 (defun imgur-authorize-interactive (base client-id client-secret)
-  (interactive  "sURL base: \nsClient ID: \nsClient secret: "))
+  "Authorize the client against BASE using `imgur-default-session-name'.
+Argument CLIENT-ID Imgur application client ID.
+Argument CLIENT-SECRET Imgur application client secret."
+  (interactive  "sURL base: \nsClient ID: \nsClient secret: ")
+  (apply #'imgur-authorize-interactive-with-session
+         `(,base ,client-id ,client-secret ,imgur-default-session-name)))
 
 (provide 'imgur)
 ;;; imgur.el ends here
