@@ -27,6 +27,8 @@
 
 ;;; Code:
 
+(require 'subr-x)
+
 (defgroup imgur nil
   "Imgur client configuration."
   :group 'external
@@ -69,6 +71,53 @@ Argument CB Callback."
          (error t))
        (when ,cb
          (funcall ,cb)))))
+
+(defun imgur--parse-creds (raw-data)
+  "Parse credentials from URL in RAW-DATA."
+  (url-parse-query-string
+   (base64-decode-string
+    (substring
+     (cadr (split-string (car (split-string raw-data "\r\n")) " ")) 1))))
+
+(defun imgur--generate-body ()
+  "Generate auth server response which redirects to itself.
+Necessary to pluck creds from fragment section and insert to path
+for extraction."
+  (string-join
+   `("<!DOCTYPE html>" "<script>"
+     ,(string-join
+       `("var r=new XMLHttpRequest()"
+         ,(string-join '("r.open('POST'," "`http://${location.host}/"
+                         "${btoa(location.hash.slice(1))}`)"))
+         "r.send()" "</script>") ";")
+     "You can close the window now.")))
+
+(defun imgur--server-handler (session base client-id client-secret)
+  "Sentinel for server requests.
+Argument SESSION Session to access creds in `imgur-creds'.
+Argument BASE URL base for API calls.
+Argument CLIENT-ID Imgur application client ID.
+Argument CLIENT-SECRET Imgur application client secret."
+  `(lambda (proc data)
+     (unwind-protect
+         (when (string= (substring data 0 4) "POST")
+           (setf
+            (alist-get 'base (alist-get (intern ,session) imgur-creds)) ,base)
+           (setf (alist-get 'client-id
+                            (alist-get (intern ,session) imgur-creds))
+                 ,client-id)
+           (setf (alist-get 'client-secret
+                            (alist-get (intern ,session) imgur-creds))
+                 ,client-secret)
+           (dolist (item (imgur--parse-creds data))
+             (setf (alist-get (intern (car item))
+                              (alist-get (intern ,session) imgur-creds))
+                   (cadr item))))
+       (process-send-string
+        proc (string-join `("HTTP/1.1 200 OK" "Connection: close"
+                            ""  ;; end headers
+                            ,(imgur--generate-body)) "\r\n")))
+     (condition-case nil (delete-process proc) (error t))))
 
 ;; public funcs
 (defun imgur-authorize (base client-id client-secret &rest args)
@@ -122,7 +171,8 @@ Optional argument ARGS allows specifying these keys:
              :service 61626
              :family 'ipv4
              :sentinel (imgur--server-create-sentinel session success)
-             :filter (lambda (&rest _))))
+             :filter (imgur--server-handler
+                      session base client-id client-secret)))
 
       (unless (alist-get (intern session) imgur-procs)
         (error "Failed creating server"))
