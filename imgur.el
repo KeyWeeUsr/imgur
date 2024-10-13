@@ -282,12 +282,13 @@ Optional argument ARGS allows specifying these keys:
 
     (let* ((url-request-method "POST")
            (url-show-status nil)
+           (boundary (make-temp-name "boundary-"))
            (url-request-extra-headers
             `(("Authorization" . ,(format
                                    "Client-ID %s"
                                    (encode-coding-string client-id 'utf-8)))
               ("Content-Type" . ,(format "multipart/form-data; boundary=%s"
-                                         "boundary")))))
+                                         boundary)))))
       (ignore url-request-method url-show-status url-request-extra-headers)
       (url-retrieve (format "%s/3/image" base)))))
 
