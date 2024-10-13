@@ -289,7 +289,22 @@ Optional argument ARGS allows specifying these keys:
                                    (encode-coding-string client-id 'utf-8)))
               ("Content-Type" . ,(format "multipart/form-data; boundary=%s"
                                          boundary))))
-           (url-request-data (with-temp-buffer (buffer-string))))
+           (url-request-data
+            (with-temp-buffer
+              ;; Multipart fields
+              (dolist (item `(("type" ,(format "%s" type))
+                              ("title" ,title)
+                              ("description" ,description)))
+                (insert (format "--%s\r\n" boundary))
+                (insert (format
+                         "Content-Disposition: form-data; name=\"%s\"\r\n"
+                         (url-hexify-string (car item))))
+                (insert "\r\n")
+                (insert (format "%s\r\n"
+                                (url-hexify-string (car (cdr item))))))
+              ;; Close multipart
+              (insert (format "--%s--\r\n" boundary))
+              (buffer-string))))
       (ignore url-request-method url-show-status url-request-extra-headers
               url-request-data)
       (url-retrieve
