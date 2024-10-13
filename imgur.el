@@ -44,6 +44,26 @@
 (defvar imgur-procs nil
   "Process references for all sessions in alists.")
 
+;; private/helper funcs
+(defun imgur--server-create-sentinel (session cb)
+  "Sentinel for auth listener.
+Argument SESSION Session to store creds into `imgur-creds'.
+Argument CB Callback."
+  `(lambda (proc state)
+     (when (alist-get (intern ,session) imgur-creds)
+       (message "%s: (%s) Credentials obtained, closing server"
+                "imgur" ,session)
+       (condition-case nil
+           (delete-process proc)
+         (error t))
+       (condition-case nil
+           (progn
+             (delete-process (alist-get (intern ,session) imgur-procs))
+             (setf (alist-get (intern ,session) imgur-procs) nil))
+         (error t))
+       (when ,cb
+         (funcall ,cb)))))
+
 ;; public funcs
 (defun imgur-authorize (base client-id client-secret &rest args)
   "Authorize the client against BASE for SESSION.
@@ -95,7 +115,7 @@ Optional argument ARGS allows specifying these keys:
              :host "127.0.0.1"
              :service 61626
              :family 'ipv4
-             :sentinel (lambda (&rest _))
+             :sentinel (imgur--server-create-sentinel session success)
              :filter (lambda (&rest _))))
 
       (unless (alist-get (intern session) imgur-procs)
