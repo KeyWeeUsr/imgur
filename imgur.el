@@ -5,7 +5,7 @@
 ;; Author: Peter Badida <keyweeusr@gmail.com>
 ;; Keywords: convenience, imgur, client
 ;; Version: 1.0.0
-;; Package-Requires: ((emacs "24.1"))
+;; Package-Requires: ((emacs "25.1"))
 ;; Homepage: https://github.com/KeyWeeUsr/imgur
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,9 @@
 
 (defvar imgur-creds nil
   "Credentials for all sessions in nested alists.")
+
+(defvar imgur-procs nil
+  "Process references for all sessions in alists.")
 
 ;; public funcs
 (defun imgur-authorize (base client-id client-secret &rest args)
@@ -76,7 +79,27 @@ Optional argument ARGS allows specifying these keys:
         (user-error err)))
 
     (if (alist-get (intern session) imgur-creds)
-        (when success (funcall success)))))
+        (when success (funcall success))
+
+      ;; TODO: allow multi-session
+      ;; a) single port + route
+      ;; b) multi-port + session-port/session-url pairing for redir URLs
+      (setf (alist-get (intern session) imgur-procs)
+            (make-network-process
+             :name (format "imgur-authorize-server")
+             :server t
+             :host "127.0.0.1"
+             :service 61626
+             :family 'ipv4
+             :sentinel (lambda (&rest _))
+             :filter (lambda (&rest _))))
+
+      (unless (alist-get (intern session) imgur-procs)
+        (error "Failed creating server"))
+
+      (browse-url
+       (format "%s/oauth2/authorize?client_id=%s&response_type=%s"
+               base (url-hexify-string client-id) "token")))))
 
 (defun imgur-authorize-interactive-with-session
     (base client-id client-secret session)
