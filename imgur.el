@@ -133,6 +133,50 @@ Argument CLIENT-SECRET Imgur application client secret."
     (with-no-warnings
       (string-as-unibyte string))))
 
+(defun imgur--build-upload-multipart
+    (type title description file &optional boundary)
+  (unless boundary
+    (setq boundary (make-temp-name "boundary-")))
+  (with-temp-buffer
+    ;; Multipart fields
+    (dolist (item `(("type" ,(format "%s" type))
+                    ("title" ,title)
+                    ("description" ,description)))
+      (insert (format "--%s\r\n" boundary))
+      (insert (format
+               "Content-Disposition: form-data; name=\"%s\"\r\n"
+               (url-hexify-string (car item))))
+      (insert "\r\n")
+      (insert (format "%s\r\n"
+                      (url-hexify-string (car (cdr item))))))
+
+    ;; Multipart files
+    (insert (format "--%s\r\n" boundary))
+    (insert
+     (format (string-join '("Content-Disposition: form-data"
+                            "name=\"%s\""
+                            "filename=\"%s\"\r\n") "; ")
+             "image"
+             (file-name-nondirectory file)))
+    (insert "Content-Type: application/octet-stream\r\n")
+    ;; end section headers
+    (insert "\r\n")
+    ;; raw body
+    (insert (with-temp-buffer
+              (insert-file-contents-literally file)
+              (imgur--as-unibyte
+               (buffer-substring-no-properties
+                (point-min) (point-max)))))
+    ;; end body
+    (insert "\r\n")
+
+    ;; Close multipart
+    (insert (format "--%s--\r\n" boundary))
+
+    ;; return value
+    (imgur--as-unibyte
+     (buffer-substring-no-properties (point-min) (point-max)))))
+
 ;; public funcs
 (defun imgur-reset (prefix)
   "Reset all modifications and state to default.
@@ -294,48 +338,12 @@ Optional argument ARGS allows specifying these keys:
             `(("Authorization" . ,(format
                                    "Client-ID %s"
                                    (encode-coding-string client-id 'utf-8)))
-              ("Content-Type" . ,(format "multipart/form-data; boundary=%s"
-                                         boundary))))
+              ("Content-Type" . ,(format
+                                  "multipart/form-data; boundary=%s"
+                                  (encode-coding-string boundary 'utf-8)))))
            (url-request-data
-            (with-temp-buffer
-              ;; Multipart fields
-              (dolist (item `(("type" ,(format "%s" type))
-                              ("title" ,title)
-                              ("description" ,description)))
-                (insert (format "--%s\r\n" boundary))
-                (insert (format
-                         "Content-Disposition: form-data; name=\"%s\"\r\n"
-                         (url-hexify-string (car item))))
-                (insert "\r\n")
-                (insert (format "%s\r\n"
-                                (url-hexify-string (car (cdr item))))))
-
-              ;; Multipart files
-              (insert (format "--%s\r\n" boundary))
-              (insert
-               (format (string-join '("Content-Disposition: form-data"
-                                      "name=\"%s\""
-                                      "filename=\"%s\"\r\n") "; ")
-                       "image"
-                       (file-name-nondirectory file)))
-              (insert "Content-Type: application/octet-stream\r\n")
-              ;; end section headers
-              (insert "\r\n")
-              ;; raw body
-              (insert (with-temp-buffer
-                        (insert-file-contents-literally file)
-                        (imgur--as-unibyte
-                         (buffer-substring-no-properties
-                          (point-min) (point-max)))))
-              ;; end body
-              (insert "\r\n")
-
-              ;; Close multipart
-              (insert (format "--%s--\r\n" boundary))
-
-              ;; return value
-              (imgur--as-unibyte
-               (buffer-substring-no-properties (point-min) (point-max))))))
+            (imgur--build-upload-multipart
+             type title description file boundary)))
       (ignore url-request-method url-show-status url-request-extra-headers
               url-request-data)
       (url-retrieve
