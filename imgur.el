@@ -408,11 +408,34 @@ Argument DESCRIPTION Description for resource on Imgur."
   (apply #'imgur-upload-image-interactive-with-session
          `(,file ,title ,description ,imgur-default-session-name)))
 
+(defun imgur-delete (base client-id access-token delete-hash &rest args)
+  "Upload resource to Imgur.
+Argument BASE URL base for API calls.
+Argument CLIENT-ID Imgur application client ID.
+Argument ACCESS-TOKEN Imgur application access token.
+Argument DELETE-HASH Hash to use for deletion.
+
+Optional argument ARGS allows specifying these keys:
+* :success - (function/nil) called on successful run
+* :fail - (function/nil) called on failed run
+* :session - (string/`imgur-default-session-name') session name"
+  (ignore base client-id access-token delete-hash args))
+
 (defun imgur-delete-interactive-with-session (delete-hash session)
   "Delete resource from Imgur using passed SESSION.
 Argument DELETE-HASH Hash to use for deletion."
   (interactive "sDelete hash: \nsSession: ")
-  (ignore delete-hash session))
+
+  (if (not (alist-get (intern session) imgur-creds))
+      (progn (message "%s: (%s) Credentials missing, obtaining"
+                      imgur-log-prefix session)
+             (call-interactively #'imgur-authorize-interactive))
+    (let ((creds (alist-get (intern session) imgur-creds)))
+      (imgur-delete
+       (alist-get 'base creds)
+       (alist-get 'client-id creds)
+       (alist-get 'access_token creds)
+       delete-hash :session session))))
 
 (provide 'imgur)
 ;;; imgur.el ends here
