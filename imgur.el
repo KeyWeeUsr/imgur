@@ -437,5 +437,13 @@ Argument DELETE-HASH Hash to use for deletion."
        (alist-get 'access_token creds)
        delete-hash :session session))))
 
+(defun imgur-delete-interactive (delete-hash)
+  "Delete resource from Imgur using the default session.
+Argument DELETE-HASH Hash to use for deletion."
+  (interactive "sDelete hash: ")
+
+  (apply #'imgur-delete-interactive-with-session
+         `(,delete-hash ,imgur-default-session-name)))
+
 (provide 'imgur)
 ;;; imgur.el ends here
