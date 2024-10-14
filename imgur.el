@@ -408,5 +408,11 @@ Argument DESCRIPTION Description for resource on Imgur."
   (apply #'imgur-upload-image-interactive-with-session
          `(,file ,title ,description ,imgur-default-session-name)))
 
+(defun imgur-delete-interactive-with-session (delete-hash session)
+  "Delete resource from Imgur using passed SESSION.
+Argument DELETE-HASH Hash to use for deletion."
+  (interactive "sDelete hash: \nsSession: ")
+  (ignore delete-hash session))
+
 (provide 'imgur)
 ;;; imgur.el ends here
