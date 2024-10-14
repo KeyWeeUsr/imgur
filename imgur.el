@@ -422,7 +422,32 @@ Optional argument ARGS allows specifying these keys:
   (let ((success (plist-get args :success))
         (fail (plist-get args :fail))
         (session (or (plist-get args :session) imgur-default-session-name)))
-    (ignore base client-id access-token delete-hash success fail session)))
+
+    (unless (or (functionp success) (null success))
+      (error "Optional :success must be a funcall-able"))
+    (unless (or (functionp fail) (null fail))
+      (error "Optional :fail must be a funcall-able"))
+
+    (when (or (null base) (eq 0 (length base)))
+      (let ((err (format "Bad base (%s)" base)))
+        (when fail (funcall fail err))
+        (user-error err)))
+
+    (when (or (null client-id) (eq 0 (length client-id)))
+      (let ((err (format "Bad client-id (%s)" client-id)))
+        (when fail (funcall fail err))
+        (user-error err)))
+
+    (when (or (null access-token) (eq 0 (length access-token)))
+      (let ((err (format "Bad access-token (%s)" access-token)))
+        (when fail (funcall fail err))
+        (user-error err)))
+
+    (when (or (null delete-hash) (eq 0 (length delete-hash)))
+      (let ((err (format "Bad delete-hash (%s)" delete-hash)))
+        (when fail (funcall fail err))
+        (user-error err)))
+    (ignore session)))
 
 (defun imgur-delete-interactive-with-session (delete-hash session)
   "Delete resource from Imgur using passed SESSION.
