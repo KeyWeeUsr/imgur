@@ -447,7 +447,21 @@ Optional argument ARGS allows specifying these keys:
       (let ((err (format "Bad delete-hash (%s)" delete-hash)))
         (when fail (funcall fail err))
         (user-error err)))
-    (ignore session)))
+
+    (let* ((url-request-method "DELETE")
+           (url-show-status nil)
+           (url-request-extra-headers
+            `(("Authorization"
+               . ,(format "Bearer %s"
+                          (encode-coding-string access-token 'utf-8))))))
+      (ignore url-request-method url-show-status url-request-extra-headers)
+
+      (url-retrieve
+       (format "%s/3/image/%s" base (url-hexify-string delete-hash))
+       (lambda (status)
+         (ignore status)
+         (message "raw: >%s<" (with-current-buffer (current-buffer)
+                                (buffer-string))))))))
 
 (defun imgur-delete-interactive-with-session (delete-hash session)
   "Delete resource from Imgur using passed SESSION.
