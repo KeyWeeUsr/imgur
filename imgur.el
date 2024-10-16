@@ -348,10 +348,53 @@ Optional argument ARGS allows specifying these keys:
               url-request-data)
       (url-retrieve
        (format "%s/3/image" base)
-       (lambda (status)
-         (ignore status)
-         (message "raw: >%s<" (with-current-buffer (current-buffer)
-                                (buffer-string))))))))
+       `(lambda (status)
+          (let (response)
+            (setf (alist-get 'raw response)
+                  (with-current-buffer (current-buffer) (buffer-string)))
+
+            (if (plist-get status :error)
+                (when ',fail (funcall ',fail status response))
+              (with-current-buffer (current-buffer)
+                (goto-char (point-min))
+                (let* (status-code
+                       (headers (buffer-substring-no-properties
+                                 (point) (search-forward "\n\n")))
+                       (body (buffer-substring-no-properties
+                              (point) (point-max))))
+                  (setf (alist-get 'headers response) headers)
+                  (setf (alist-get 'body response)
+                        (condition-case err
+                            (json-parse-string
+                             body
+                             :object-type 'alist
+                             :array-type 'list
+                             :null-object nil
+                             :false-object nil)
+                          (error
+                           (message "%s: Could not parse response (%s)"
+                                    imgur-log-prefix
+                                    (error-message-string err))
+                           nil)))
+
+                  (goto-char (point-min))
+                  (if (re-search-forward "^HTTP/1\\.1 \\([0-9]+\\)" nil t)
+                      (progn
+                        (setq status-code (match-string 1))
+                        (setf (alist-get 'status response) status-code)
+                        (if (and (eq (length status-code) 3)
+                                 (string-prefix-p "2" status-code))
+                            (progn
+                              (message "%s: (%s) Upload successful"
+                                       ,imgur-log-prefix ,session)
+                              (when ',success
+                                (funcall ',success status response)))
+                          (message "%s: (%s) Upload failed (%s)"
+                                   ,imgur-log-prefix ,session status-code)
+                          (when ',fail (funcall ',fail status response))))
+                    (message "%s: (%s) Failed to parse status code (%s)"
+                             ,imgur-log-prefix ,session status-code)
+                    (when ',fail (funcall ',fail status response))))))))))))
 
 (defun imgur-upload-interactive-with-session
     (type file title description session)
@@ -458,10 +501,53 @@ Optional argument ARGS allows specifying these keys:
 
       (url-retrieve
        (format "%s/3/image/%s" base (url-hexify-string delete-hash))
-       (lambda (status)
-         (ignore status)
-         (message "raw: >%s<" (with-current-buffer (current-buffer)
-                                (buffer-string))))))))
+       `(lambda (status)
+          (let (response)
+            (setf (alist-get 'raw response)
+                  (with-current-buffer (current-buffer) (buffer-string)))
+
+            (if (plist-get status :error)
+                (when ',fail (funcall ',fail status response))
+              (with-current-buffer (current-buffer)
+                (goto-char (point-min))
+                (let* (status-code
+                       (headers (buffer-substring-no-properties
+                                 (point) (search-forward "\n\n")))
+                       (body (buffer-substring-no-properties
+                              (point) (point-max))))
+                  (setf (alist-get 'headers response) headers)
+                  (setf (alist-get 'body response)
+                        (condition-case err
+                            (json-parse-string
+                             body
+                             :object-type 'alist
+                             :array-type 'list
+                             :null-object nil
+                             :false-object nil)
+                          (error
+                           (message "%s: Could not parse response (%s)"
+                                    imgur-log-prefix
+                                    (error-message-string err))
+                           nil)))
+
+                  (goto-char (point-min))
+                  (if (re-search-forward "^HTTP/1\\.1 \\([0-9]+\\)" nil t)
+                      (progn
+                        (setq status-code (match-string 1))
+                        (setf (alist-get 'status response) status-code)
+                        (if (and (eq (length status-code) 3)
+                                 (string-prefix-p "2" status-code))
+                            (progn
+                              (message "%s: (%s) Deletion successful"
+                                       ,imgur-log-prefix ,session)
+                              (when ',success
+                                (funcall ',success status response)))
+                          (message "%s: (%s) Deletion failed (%s)"
+                                   ,imgur-log-prefix ,session status-code)
+                          (when ',fail (funcall ',fail status response))))
+                    (message "%s: (%s) Failed to parse status code (%s)"
+                             ,imgur-log-prefix ,session status-code)
+                    (when ',fail (funcall ',fail status response))))))))))))
 
 (defun imgur-delete-interactive-with-session (delete-hash session)
   "Delete resource from Imgur using passed SESSION.
