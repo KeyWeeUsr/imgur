@@ -76,8 +76,8 @@ Argument CB Callback."
              (delete-process (alist-get (intern ,session) imgur-procs))
              (setf (alist-get (intern ,session) imgur-procs) nil))
          (error t))
-       (when ,cb
-         (funcall ,cb)))))
+       (when ',cb
+         (funcall ',cb)))))
 
 (defun imgur--parse-creds (raw-data)
   "Parse credentials from URL in RAW-DATA."
