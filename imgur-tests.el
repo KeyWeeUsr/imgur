@@ -294,6 +294,58 @@
               (should (= (plist-get (cdr err-data) :service) port)))))
           (advice-remove 'message (lambda (&rest _))))))
 
+(ert-deftest imgur-upload-against-http-text-unsupported-status ()
+  "Try against server responding with an invalid HTTP code."
+  (call-interactively 'imgur-reset)
+  (let* ((host "127.0.0.1")
+         (port 8003)
+         (timeout 1)
+         (start-time (current-time))
+         failed success
+         (imgur-upload-fail-func (lambda (status resp)
+                                   (setf (alist-get 'status failed) status
+                                         (alist-get 'resp failed) resp)))
+         (imgur-upload-success-func (lambda (status resp)
+                                      (setf (alist-get 'status success) status
+                                            (alist-get 'resp success) resp)))
+         (expected-data "HTTP/1.1 123 Fake Response\nabc\n\n")
+         connection-done request-done
+         (dummy-server
+          (make-network-process
+           :name (format "dummy (%s:%s)" host port)
+           :server t :host host :service port :family 'ipv4
+           :sentinel `(lambda (proc &rest _) (setq connection-done t))
+           :filter `(lambda (proc &rest _)
+                      (process-send-string proc expected-data)
+                      (setq request-done t)
+                      (delete-process proc)))))
+    (unwind-protect
+        (progn
+          (advice-add 'message :override (lambda (&rest _)))
+          (setf (alist-get 'base (alist-get 'default imgur-creds))
+                (format "http://%s:%s" host port)
+                (alist-get 'client-id (alist-get 'default imgur-creds))
+                "client-id"
+                (alist-get 'client-secret (alist-get 'default imgur-creds))
+                "client-secret")
+          (should-not failed)
+          (should-not success)
+          ;; TODO: unhandled url-retrieve signal
+          (condition-case err
+              (progn
+                (apply 'imgur-upload-image-interactive
+                       '("tiny.gif" "" ""))
+                (while (and (not connection-done) (not request-done))
+                  (sleep-for 0.1)))
+            (error
+             (unless (string-match "HTTP responses in class 1xx not supported"
+                                   (error-message-string err))
+               (signal (car err) (cdr err)))))
+          (should-not success)
+          (should-not failed))
+      (delete-process dummy-server)
+      (advice-remove 'message (lambda (&rest _))))))
+
 (provide 'imgur-tests)
 
 ;;; imgur-tests.el ends here
