@@ -23,6 +23,17 @@ byte-compile: \
 .PHONY: test
 test: byte-compile main-tests
 
+.PHONY: integration-tests
+integration-tests: integration-tests
+
+imgur-integration-tests.ok: imgur-integration-tests.elc
+	$(EMACS) --batch --quick \
+		--directory . \
+		--load imgur-integration-tests.el \
+		--funcall ert-run-tests-batch \
+	&& touch imgur-integration-tests.ok
+integration-tests: imgur-integration-tests.ok
+
 imgur-tests.ok: \
 	imgur.elc imgur-tests.elc
 	$(EMACS) --batch --quick \
