@@ -190,6 +190,14 @@ Argument CLIENT-SECRET Imgur application client secret."
     (imgur--as-unibyte
      (buffer-substring-no-properties (point-min) (point-max)))))
 
+(defun imgur--parse-http-code ()
+  "Search numeric HTTP status code in the current buffer from `point'."
+  (with-current-buffer (current-buffer)
+    (save-excursion
+      (save-match-data
+        (when (re-search-forward "^HTTP/1\\.1 \\([0-9]+\\)" nil t)
+          (string-to-number (match-string 1)))))))
+
 ;; public funcs
 (defun imgur-reset (prefix)
   "Reset all modifications and state to default.
