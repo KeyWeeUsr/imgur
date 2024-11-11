@@ -54,6 +54,114 @@
   :group 'imgur
   :type '(repeat symbol))
 
+(defcustom imgur-upload-headers
+  '(x-post-rate-limit-remaining x-post-rate-limit-reset)
+  "Headers to display with `imgur-upload-success-func' and
+  `imgur-upload-fail-func'."
+  :group 'imgur
+  :type '(repeat symbol))
+
+(defcustom imgur-upload-fields
+  '(link deletehash)
+  "Fields to display with `imgur-upload-success-func' and
+  `imgur-upload-fail-func'."
+  :group 'imgur
+  :type '(repeat symbol))
+
+(defun imgur-upload-default-success-func (status response)
+  "Default upload success displaying function."
+  (ignore status)
+  (let ((msg (format "%s: (%s) Upload response (%s) |"
+                     imgur-log-prefix (imgur-response-session response)
+                     (imgur-response-status response)))
+        (headers (imgur-response-headers response))
+        (data (alist-get 'data (imgur-response-body response))))
+    (when data
+      (dolist (key imgur-upload-fields)
+        (setq msg (format "%s %s: %S" msg key (alist-get key data)))))
+    (when headers
+      (dolist (key imgur-upload-headers)
+        (setq msg (format "%s %s: %S" msg key (alist-get key headers)))))
+    (message msg)))
+
+(defvar imgur-upload-success-func #'imgur-upload-default-success-func
+  "Upload success displaying function.")
+
+(defun imgur-upload-default-fail-func (status response)
+  "Default upload failure displaying function."
+  (ignore status)
+  (let ((msg (format "%s: (%s) Upload response (%s) |"
+                     imgur-log-prefix (imgur-response-session response)
+                     (imgur-response-status response)))
+        (headers (imgur-response-headers response))
+        (data (alist-get 'data (imgur-response-body response))))
+    (if (>= 500 (or (imgur-response-status response) 500))
+        (setq msg (format "%s %s" msg (imgur-response-raw response)))
+      (when data
+        (dolist (key imgur-upload-fields)
+          (setq msg (format "%s %s: %S" msg key (alist-get key data)))))
+      (when headers
+        (dolist (key imgur-upload-headers)
+          (setq msg (format "%s %s: %S" msg key (alist-get key headers)))))
+      (message msg))))
+
+(defvar imgur-upload-fail-func #'imgur-upload-default-fail-func
+  "Upload failure displaying function.")
+
+(defcustom imgur-delete-headers
+  '(x-ratelimit-userremaining x-ratelimit-userreset)
+  "Headers to display with `imgur-delete-success-func' and
+  `imgur-delete-fail-func'."
+  :group 'imgur
+  :type '(repeat symbol))
+
+(defcustom imgur-delete-fields
+  nil
+  "Fields to display with `imgur-delete-success-func' and
+  `imgur-delete-fail-func'."
+  :group 'imgur
+  :type '(repeat symbol))
+
+(defun imgur-delete-default-success-func (status response)
+  "Default delete success displaying function."
+  (ignore status)
+  (let ((msg (format "%s: (%s) Delete response (%s) |"
+                     imgur-log-prefix (imgur-response-session response)
+                     (imgur-response-status response)))
+        (headers (imgur-response-headers response))
+        (data (alist-get 'data (imgur-response-body response))))
+    (when data
+      (dolist (key imgur-delete-fields)
+        (setq msg (format "%s %s: %S" msg key (alist-get key data)))))
+    (when headers
+      (dolist (key imgur-delete-headers)
+        (setq msg (format "%s %s: %S" msg key (alist-get key headers)))))
+    (message msg)))
+
+(defvar imgur-delete-success-func #'imgur-delete-default-success-func
+  "Delete success displaying function.")
+
+(defun imgur-delete-default-fail-func (status response)
+  "Default delete failure displaying function."
+  (ignore status)
+  (let ((msg (format "%s: (%s) Delete response (%s) |"
+                     imgur-log-prefix (imgur-response-session response)
+                     (imgur-response-status response)))
+        (headers (imgur-response-headers response))
+        (data (alist-get 'data (imgur-response-body response))))
+    (if (>= 500 (or (imgur-response-status response) 500))
+        (setq msg (format "%s %s" msg (imgur-response-raw response)))
+      (when data
+        (dolist (key imgur-delete-fields)
+          (setq msg (format "%s %s: %S" msg key (alist-get key data)))))
+      (when headers
+        (dolist (key imgur-delete-headers)
+          (setq msg (format "%s %s: %S" msg key (alist-get key headers)))))
+      (message msg))))
+
+(defvar imgur-delete-fail-func #'imgur-delete-default-fail-func
+  "Delete failure displaying function.")
+
 (defvar imgur-creds nil
   "Credentials for all sessions in nested alists.")
 
