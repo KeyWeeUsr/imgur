@@ -73,20 +73,24 @@
 
 (defcustom imgur-upload-headers
   '(x-post-rate-limit-remaining x-post-rate-limit-reset)
-  "Headers to display with `imgur-upload-success-func' and
-  `imgur-upload-fail-func'."
+  "Headers to display with success and failure event handlers.
+* `imgur-upload-success-func'
+* `imgur-upload-fail-func'"
   :group 'imgur
   :type '(repeat symbol))
 
 (defcustom imgur-upload-fields
   '(link deletehash)
-  "Fields to display with `imgur-upload-success-func' and
-  `imgur-upload-fail-func'."
+  "Fields to display with success and failure event handlers.
+* `imgur-upload-success-func'
+* `imgur-upload-fail-func'."
   :group 'imgur
   :type '(repeat symbol))
 
 (defun imgur-upload-default-success-func (status response)
-  "Default upload success displaying function."
+  "Default upload success displaying function.
+Argument STATUS Forwarded from `url-retrieve'.
+Argument RESPONSE `imgur-response'."
   (ignore status)
   (let ((msg (format "%s: (%s) Upload response (%s) |"
                      imgur-log-prefix (imgur-response-session response)
@@ -105,7 +109,9 @@
   "Upload success displaying function.")
 
 (defun imgur-upload-default-fail-func (status response)
-  "Default upload failure displaying function."
+  "Default upload failure displaying function.
+Argument STATUS Forwarded from `url-retrieve'.
+Argument RESPONSE `imgur-response'."
   (ignore status)
   (let ((msg (format "%s: (%s) Upload response (%s) |"
                      imgur-log-prefix (imgur-response-session response)
@@ -127,20 +133,24 @@
 
 (defcustom imgur-delete-headers
   '(x-ratelimit-userremaining x-ratelimit-userreset)
-  "Headers to display with `imgur-delete-success-func' and
-  `imgur-delete-fail-func'."
+  "Headers to display with success and failure event handlers.
+* `imgur-delete-success-func'
+* `imgur-delete-fail-func'."
   :group 'imgur
   :type '(repeat symbol))
 
 (defcustom imgur-delete-fields
   nil
-  "Fields to display with `imgur-delete-success-func' and
-  `imgur-delete-fail-func'."
+  "Fields to display with success and failure event handlers.
+* `imgur-delete-success-func'
+* `imgur-delete-fail-func'."
   :group 'imgur
   :type '(repeat symbol))
 
 (defun imgur-delete-default-success-func (status response)
-  "Default delete success displaying function."
+  "Default delete success displaying function.
+Argument STATUS Forwarded from `url-retrieve'.
+Argument RESPONSE `imgur-response'."
   (ignore status)
   (let ((msg (format "%s: (%s) Delete response (%s) |"
                      imgur-log-prefix (imgur-response-session response)
@@ -159,7 +169,9 @@
   "Delete success displaying function.")
 
 (defun imgur-delete-default-fail-func (status response)
-  "Default delete failure displaying function."
+  "Default delete failure displaying function.
+Argument STATUS Forwarded from `url-retrieve'.
+Argument RESPONSE `imgur-response'."
   (ignore status)
   (let ((msg (format "%s: (%s) Delete response (%s) |"
                      imgur-log-prefix (imgur-response-session response)
@@ -273,6 +285,12 @@ Argument CLIENT-SECRET Imgur application client secret."
 
 (defun imgur--build-upload-multipart
     (type title description file &optional boundary)
+  "Build upload multipart body.
+Argument TYPE Resource type.
+Argument TITLE Resource title.
+Argument DESCRIPTION Resource description.
+Argument FILE Resource filepath.
+Optional argument BOUNDARY Custom multipart boundary string."
   (unless boundary
     (setq boundary (make-temp-name "boundary-")))
   (with-temp-buffer
@@ -449,7 +467,7 @@ Callable parameters for `:success' and `:fail' have this structure:
 * status - forwarded from `url-retrieve'
 * response - `imgur-response'
 
-Handling errors: First check for `imgur-response-success'. If
+Handling errors: First check for `imgur-response-success'.  If
 broken check for `imgur-response-raw' and `imgur-response-error'
 and if doesn't help, check for the forwarded `status' argument."
   (let ((success (plist-get args :success))
@@ -658,7 +676,7 @@ Callable parameters for `:success' and `:fail' have this structure:
 * status - forwarded from `url-retrieve'
 * response - `imgur-response'
 
-Handling errors: First check for `imgur-response-success'. If
+Handling errors: First check for `imgur-response-success'.  If
 broken check for `imgur-response-raw' and `imgur-response-error'
 and if doesn't help, check for the forwarded `status' argument."
   (let ((success (plist-get args :success))
