@@ -5,7 +5,7 @@
 ;; Author: Peter Badida <keyweeusr@gmail.com>
 ;; Keywords: convenience, imgur, client
 ;; Version: 1.0.0
-;; Package-Requires: ((emacs "25.1"))
+;; Package-Requires: ((emacs "27.1"))
 ;; Homepage: https://github.com/KeyWeeUsr/imgur
 
 ;; This program is free software; you can redistribute it and/or modify
