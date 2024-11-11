@@ -156,6 +156,38 @@
               (should (= (plist-get (cdr err-data) :service) port)))))
       (advice-remove 'message (lambda (&rest _))))))
 
+(ert-deftest imgur-upload-against-unresolved-and-deleted ()
+  "Try against unresolved destination."
+  (call-interactively 'imgur-reset)
+  (let* ((host "unresolved")
+         (port 123)
+         failed
+         (imgur-upload-fail-func (lambda (status resp)
+                                   (setq failed `(,status ,resp)))))
+    (setf (alist-get 'base (alist-get 'default imgur-creds))
+          (format "http://%s:%s" host port)
+          (alist-get 'client-id (alist-get 'default imgur-creds))
+          "client-id"
+          (alist-get 'client-secret (alist-get 'default imgur-creds))
+          "client-secret")
+    (should-not failed)
+    (apply 'imgur-upload-image-interactive '("tiny.gif" "" ""))
+    (dolist (item (process-list))
+      (when (string= host (process-name item))
+        (delete-process item)))
+    (should failed)
+    (should (= 2 (length (car failed))))
+    (let* ((err (car failed))
+           (resp (cadr failed))
+           (pulled-err (plist-get err :error)))
+      (unless pulled-err
+        (should-not "Failed retrieving :error"))
+      (should (eq 'connection-failed (cadr pulled-err)))
+      (let ((err-data (cddr pulled-err)))
+        (should (string= "deleted" (string-trim-right (car err-data))))
+        (should (string= (plist-get (cdr err-data) :host) host))
+        (should (= (plist-get (cdr err-data) :service) port))))))
+
 (provide 'imgur-tests)
 
 ;;; imgur-tests.el ends here
