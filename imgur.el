@@ -28,6 +28,7 @@
 ;;; Code:
 
 (require 'subr-x)
+(require 'cl-lib)
 
 (defgroup imgur nil
   "Imgur client configuration."
@@ -58,6 +59,18 @@
 
 (defvar imgur-procs nil
   "Process references for all sessions in alists.")
+
+(cl-defstruct imgur-response
+  "Structure holding overall HTTP response state and possible errors."
+  (session "" :type 'string :documentation "Session name used for request.")
+  (error nil :type 'error :documentation
+         "Encountered error while issuing or processing request.")
+  (raw "" :type 'string :documentation "Raw response as seen in the buffer.")
+  (status 0 :type 'number :documentation "HTTP status code.")
+  (headers nil :type 'list :documentation
+           "Alist key-value header pairs. The key is always lowercase.")
+  (body nil :type 'list :documentation "JSON parsed into alist.")
+  (success nil :type 'boolean :documentation "Overall success state."))
 
 ;; private/helper funcs
 (defun imgur--server-create-sentinel (session cb)
