@@ -86,7 +86,7 @@
                     noninteractive)
     (unwind-protect
         (progn
-          (advice-add 'read-string :override (lambda (&rest r) (setq asked t)))
+          (advice-add 'y-or-n-p :override (lambda (&rest r) (setq asked t)))
           (advice-add 'make-network-process
                       :override (lambda (&rest r) (setq server-launched t)))
           (advice-add 'browse-url
@@ -98,7 +98,7 @@
                      (lambda (&rest r) (setq server-launched t)))
       (advice-remove 'browse-url
                      (lambda (&rest r) (setq browser-opened t)))
-      (advice-remove 'read-string (lambda (&rest r))))))
+      (advice-remove 'y-or-n-p (lambda (&rest r))))))
 
 (ert-deftest imgur-upload-missing-or-empty-args ()
   "Check for missing or empty args in upload func."

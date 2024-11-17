@@ -87,6 +87,12 @@
   :group 'imgur
   :type '(repeat symbol))
 
+(define-error 'imgur-error "Generic imgur error")
+
+(define-error 'imgur-error-authorization-interrupted
+  "Authorization interrupted!"
+  'imgur-error)
+
 (defun imgur-upload-default-success-func (status response)
   "Default upload success displaying function.
 Argument STATUS Forwarded from `url-retrieve'.
@@ -407,7 +413,8 @@ Optional argument ARGS allows specifying these keys:
         (error nil))
 
       (unless noninteractive
-        (read-string "Opening authorization website (press enter)..."))
+        (unless (y-or-n-p "Open authorization website?")
+          (signal 'imgur-error-authorization-interrupted nil)))
 
       ;; TODO: allow multi-session
       ;; a) single port + route
