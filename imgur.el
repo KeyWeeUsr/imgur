@@ -284,10 +284,7 @@ Argument CLIENT-SECRET Imgur application client secret."
 
 (defun imgur--as-unibyte (string)
   "Convert multibyte STRING to unibyte."
-  (if (boundp 'encode-coding-char)
-      (encode-coding-char string 'utf-8)
-    (with-no-warnings
-      (string-as-unibyte string))))
+  (encode-coding-string string 'utf-8))
 
 (defun imgur--build-upload-multipart
     (type title description file &optional boundary)
