@@ -112,9 +112,9 @@
              (("base" "" nil nil nil nil nil)
               ,(format "Bad client-id (%s)" ""))
              (("base" "id" nil nil nil nil nil)
-              ,(format "Bad client-secret (%s)" nil))
+              ,(format "Bad access-token (%s)" nil))
              (("base" "id" "" nil nil nil nil)
-              ,(format "Bad client-secret (%s)" ""))))
+              ,(format "Bad access-token (%s)" ""))))
     (condition-case err
         (progn (apply #'imgur-upload (car args-result)) (should nil))
       (user-error (should (string= (cadr args-result)
@@ -135,8 +135,8 @@
                 (format "http://%s:%s" host port)
                 (alist-get 'client-id (alist-get 'default imgur-creds))
                 "client-id"
-                (alist-get 'client-secret (alist-get 'default imgur-creds))
-                "client-secret")
+                (alist-get 'access_token (alist-get 'default imgur-creds))
+                "access-token")
           (should-not failed)
           (apply 'imgur-upload-image-interactive '("tiny.gif" "" ""))
           (dolist (item (process-list))
@@ -168,8 +168,8 @@
           (format "http://%s:%s" host port)
           (alist-get 'client-id (alist-get 'default imgur-creds))
           "client-id"
-          (alist-get 'client-secret (alist-get 'default imgur-creds))
-          "client-secret")
+          (alist-get 'access_token (alist-get 'default imgur-creds))
+          "access-token")
     (should-not failed)
     (apply 'imgur-upload-image-interactive '("tiny.gif" "" ""))
     (dolist (item (process-list))
@@ -205,8 +205,8 @@
                 (format "http://%s:%s" host port)
                 (alist-get 'client-id (alist-get 'default imgur-creds))
                 "client-id"
-                (alist-get 'client-secret (alist-get 'default imgur-creds))
-                "client-secret")
+                (alist-get 'access_token (alist-get 'default imgur-creds))
+                "access-token")
           (should-not failed)
           (apply 'imgur-upload-image-interactive '("tiny.gif" "" ""))
           (while (time-less-p (time-since start-time) timeout) (sit-for 0.1))
@@ -258,8 +258,8 @@
                 (format "http://%s:%s" host port)
                 (alist-get 'client-id (alist-get 'default imgur-creds))
                 "client-id"
-                (alist-get 'client-secret (alist-get 'default imgur-creds))
-                "client-secret")
+                (alist-get 'access_token (alist-get 'default imgur-creds))
+                "access-token")
           (should-not failed)
           (apply 'imgur-upload-image-interactive '("tiny.gif" "" ""))
           (while (time-less-p (time-since start-time) timeout) (sit-for 0.1))
@@ -326,8 +326,8 @@
                 (format "http://%s:%s" host port)
                 (alist-get 'client-id (alist-get 'default imgur-creds))
                 "client-id"
-                (alist-get 'client-secret (alist-get 'default imgur-creds))
-                "client-secret")
+                (alist-get 'access_token (alist-get 'default imgur-creds))
+                "access-token")
           (should-not failed)
           (should-not success)
           ;; TODO: unhandled url-retrieve signal
@@ -1031,8 +1031,8 @@
                     (format "http://%s:%s" host port)
                     (alist-get 'client-id (alist-get 'default imgur-creds))
                     "client-id"
-                    (alist-get 'client-secret (alist-get 'default imgur-creds))
-                    "client-secret")
+                    (alist-get 'access_token (alist-get 'default imgur-creds))
+                    "access-token")
               (should-not failed)
               (should-not success)
               (apply 'imgur-upload-image-interactive '("tiny.gif" "" ""))

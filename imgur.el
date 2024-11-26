@@ -4,7 +4,7 @@
 
 ;; Author: Peter Badida <keyweeusr@gmail.com>
 ;; Keywords: convenience, imgur, client
-;; Version: 1.0.0
+;; Version: 1.1.0
 ;; Package-Requires: ((emacs "27.1"))
 ;; Homepage: https://github.com/KeyWeeUsr/imgur
 
@@ -451,11 +451,11 @@ Argument CLIENT-SECRET Imgur application client secret."
          `(,base ,client-id ,client-secret ,imgur-default-session-name)))
 
 (defun imgur-upload
-    (base client-id client-secret type file title description &rest args)
+    (base client-id access-token type file title description &rest args)
   "Upload resource to Imgur.
 Argument BASE URL base for API calls.
 Argument CLIENT-ID Imgur application client ID.
-Argument CLIENT-SECRET Imgur application client secret.
+Argument ACCESS-TOKEN Imgur application access token.
 Argument TYPE Resource type from `imgur-allowed-types'.
 Argument FILE Path to resource.
 Argument TITLE Title for resource on Imgur.
@@ -494,8 +494,8 @@ and if doesn't help, check for the forwarded `status' argument."
         (when fail (funcall fail err nil))
         (user-error err)))
 
-    (when (or (null client-secret) (eq 0 (length client-secret)))
-      (let ((err (format "Bad client-secret (%s)" client-secret)))
+    (when (or (null access-token) (eq 0 (length access-token)))
+      (let ((err (format "Bad access-token (%s)" access-token)))
         (when fail (funcall fail err nil))
         (user-error err)))
 
@@ -513,8 +513,8 @@ and if doesn't help, check for the forwarded `status' argument."
            (boundary (make-temp-name "boundary-"))
            (url-request-extra-headers
             `(("Authorization" . ,(format
-                                   "Client-ID %s"
-                                   (encode-coding-string client-id 'utf-8)))
+                                   "Bearer %s"
+                                   (encode-coding-string access-token 'utf-8)))
               ("Content-Type" . ,(format
                                   "multipart/form-data; boundary=%s"
                                   (encode-coding-string boundary 'utf-8)))))
@@ -623,7 +623,7 @@ Argument DESCRIPTION Description for resource on Imgur."
       (imgur-upload
        (alist-get 'base creds)
        (alist-get 'client-id creds)
-       (alist-get 'client-secret creds)
+       (alist-get 'access_token creds)
        type file title description
        :success imgur-upload-success-func
        :fail imgur-upload-fail-func
