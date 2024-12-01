@@ -410,7 +410,7 @@ Optional argument ARGS allows specifying these keys:
         (error nil))
 
       (unless noninteractive
-        (unless (y-or-n-p "Open authorization website?")
+        (unless (y-or-n-p "Open authorization website? ")
           (signal 'imgur-error-authorization-interrupted nil)))
 
       ;; TODO: allow multi-session

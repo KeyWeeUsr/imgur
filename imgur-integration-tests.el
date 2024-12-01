@@ -7,15 +7,16 @@
 (setq ert-quiet t)
 
 (defvar imgur--deletehash nil)
-(defun imgur--parse-upload (status response)
-  "Parse deletehash from upload response."
-  (ignore status)
-  )
+
 
 (ert-deftest imgur-real-upload-and-delete ()
   "Try against real Imgur API."
   (call-interactively 'imgur-reset)
-  (let (done deletehash)
+  (let ((client-id (getenv "IMGUR_CLIENT_ID"))
+        (client-secret (getenv "IMGUR_CLIENT_SECRET"))
+        done deletehash)
+    (when (or (not client-id) (not client-secret))
+      (error "Missing credentials IMGUR_CLIENT_ID, IMGUR_CLIENT_SECRET"))
     (unwind-protect
         (progn
           (advice-add
@@ -29,8 +30,8 @@
              (setq done t)))
           (apply #'imgur-authorize-interactive
                  `("https://api.imgur.com"
-                   ,(getenv "IMGUR_CLIENT_ID")
-                   ,(getenv "IMGUR_CLIENT_SECRET")))
+                   ,client-id
+                   ,client-secret))
           (message "Test: Authorizing")
           (while (null imgur-creds)
             (message "...still authorizing")
