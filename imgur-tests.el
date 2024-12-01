@@ -357,7 +357,7 @@
 
 (ert-deftest imgur-upload-against-http-matrix ()
   "Try against various cases of status/headers/body contents."
-  (let ((counter 0)
+  (let ((counter 0) matrix-item-success
         (matrix
          `((:status "" :headers "" :body ""
             :success nil
@@ -365,8 +365,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-end-of-file
-                         "'[' or '{' expected near end of file" "<string>"
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
                          1 0 0)
                        :raw "\n"
                        :status 0
@@ -380,9 +383,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-parse-error
-                         "'[' or '{' expected near '-'" "<string>"
-                         1 1 1)
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
                        :raw "\n-"
                        :status 0
                        :headers nil
@@ -407,8 +412,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-end-of-file
-                         "'[' or '{' expected near end of file" "<string>"
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
                          1 0 0)
                        :raw "-\n\n"
                        :status 0
@@ -422,9 +430,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-parse-error
-                         "'[' or '{' expected near '-'" "<string>"
-                         1 1 1)
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
                        :raw "-\n\n-"
                        :status 0
                        :headers nil
@@ -449,8 +459,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-end-of-file
-                         "'[' or '{' expected near end of file" "<string>"
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
                          1 0 0)
                        :raw "Header: Value\n\n"
                        :status 0
@@ -464,9 +477,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-parse-error
-                         "'[' or '{' expected near '-'" "<string>"
-                         1 1 1)
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
                        :raw "Header: Value\n\n-"
                        :status 0
                        :headers nil
@@ -491,8 +506,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-end-of-file
-                         "'[' or '{' expected near end of file" "<string>"
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
                          1 0 0)
                        :raw "-\n\n"
                        :status 0
@@ -506,9 +524,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-parse-error
-                         "'[' or '{' expected near '-'" "<string>"
-                         1 1 1)
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
                        :raw "-\n\n-"
                        :status 0
                        :headers nil
@@ -533,8 +553,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-end-of-file
-                         "'[' or '{' expected near end of file" "<string>"
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
                          1 0 0)
                        :raw "-\n-\n\n"
                        :status 0
@@ -548,9 +571,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-parse-error
-                         "'[' or '{' expected near '-'" "<string>"
-                         1 1 1)
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
                        :raw "-\n-\n\n-"
                        :status 0
                        :headers nil
@@ -575,8 +600,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-end-of-file
-                         "'[' or '{' expected near end of file" "<string>"
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
                          1 0 0)
                        :raw "-\nHeader: Value\n\n"
                        :status 0
@@ -590,8 +618,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-end-of-file
-                         "'[' or '{' expected near end of file" "<string>"
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
                          1 0 0)
                        :raw "-\nHeader: Value\nHeader: Value2\n\n"
                        :status 0
@@ -605,8 +636,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-end-of-file
-                         "'[' or '{' expected near end of file" "<string>"
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
                          1 0 0)
                        :raw "-\nHeader: Value\nHeader2: Value2\n\n"
                        :status 0
@@ -620,9 +654,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-parse-error
-                         "'[' or '{' expected near '-'" "<string>"
-                         1 1 1)
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
                        :raw "-\nHeader: Value\n\n-"
                        :status 0
                        :headers '((header . "Value"))
@@ -635,9 +671,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-parse-error
-                         "'[' or '{' expected near '-'" "<string>"
-                         1 1 1)
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
                        :raw "-\nHeader: Value\nHeader: Value2\n\n-"
                        :status 0
                        :headers '((header . "Value2"))
@@ -650,9 +688,11 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       '(json-parse-error
-                         "'[' or '{' expected near '-'" "<string>"
-                         1 1 1)
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
                        :raw "-\nHeader: Value\nHeader2: Value2\n\n-"
                        :status 0
                        :headers '((header . "Value") (header2 . "Value2"))
@@ -702,115 +742,130 @@
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :session "default"
-                      :error
-                      '(json-end-of-file
-                        "'[' or '{' expected near end of file" "<string>"
-                        1 0 0)
-                      :raw "HTTP/1.1 432 Fake\n\n"
-                      :status 432
-                      :headers nil
-                      :body nil
-                      :success nil))
+                       :session "default"
+                       :error
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
+                         1 0 0)
+                       :raw "HTTP/1.1 432 Fake\n\n"
+                       :status 432
+                       :headers nil
+                       :body nil
+                       :success nil))
              (status . (:error (error http 432)))))
            (:status "HTTP/1.1 432 Fake\n" :headers "" :body "-"
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :session "default"
-                      :error
-                      '(json-parse-error
-                        "'[' or '{' expected near '-'" "<string>"
-                        1 1 1)
-                      :raw "HTTP/1.1 432 Fake\n\n-"
-                      :status 432
-                      :headers nil
-                      :body nil
-                      :success nil))
+                       :session "default"
+                       :error
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
+                       :raw "HTTP/1.1 432 Fake\n\n-"
+                       :status 432
+                       :headers nil
+                       :body nil
+                       :success nil))
              (status . (:error (error http 432)))))
            (:status "HTTP/1.1 432 Fake\n" :headers "" :body "{\"a\":\"b\"}"
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 432
-                      :headers nil
-                      :body '((a . "b"))
-                      :session "default"
-                      :error nil
-                      :raw "HTTP/1.1 432 Fake\n\n{\"a\":\"b\"}"
-                      :success nil))
+                       :status 432
+                       :headers nil
+                       :body '((a . "b"))
+                       :session "default"
+                       :error nil
+                       :raw "HTTP/1.1 432 Fake\n\n{\"a\":\"b\"}"
+                       :success nil))
              (status . (:error (error http 432)))))
            (:status "HTTP/1.1 432 Fake\n" :headers "-\n" :body ""
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 432
-                      :headers nil
-                      :body nil
-                      :session "default"
-                      :error
-                      '(json-end-of-file
-                        "'[' or '{' expected near end of file" "<string>"
-                        1 0 0)
-                      :raw "HTTP/1.1 432 Fake\n-\n\n"
-                      :success nil))
+                       :status 432
+                       :headers nil
+                       :body nil
+                       :session "default"
+                       :error
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
+                         1 0 0)
+                       :raw "HTTP/1.1 432 Fake\n-\n\n"
+                       :success nil))
              (status . (:error (error http 432)))))
            (:status "HTTP/1.1 432 Fake\n" :headers "-\n" :body "-"
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 432
-                      :headers nil
-                      :body nil
-                      :session "default"
-                      :error
-                      '(json-parse-error
-                        "'[' or '{' expected near '-'" "<string>"
-                        1 1 1)
-                      :raw "HTTP/1.1 432 Fake\n-\n\n-"
-                      :success nil))
+                       :status 432
+                       :headers nil
+                       :body nil
+                       :session "default"
+                       :error
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
+                       :raw "HTTP/1.1 432 Fake\n-\n\n-"
+                       :success nil))
              (status . (:error (error http 432)))))
            (:status "HTTP/1.1 432 Fake\n" :headers "-\n" :body "{\"a\":\"b\"}"
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 432
-                      :headers nil
-                      :body '((a . "b"))
-                      :session "default"
-                      :error nil
-                      :raw "HTTP/1.1 432 Fake\n-\n\n{\"a\":\"b\"}"
-                      :success nil))
+                       :status 432
+                       :headers nil
+                       :body '((a . "b"))
+                       :session "default"
+                       :error nil
+                       :raw "HTTP/1.1 432 Fake\n-\n\n{\"a\":\"b\"}"
+                       :success nil))
              (status . (:error (error http 432)))))
            (:status "HTTP/1.1 432 Fake\n" :headers "Header: Value\n" :body ""
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 432
-                      :headers '((header . "Value"))
-                      :body nil
-                      :session "default"
-                      :error
-                      '(json-end-of-file
-                        "'[' or '{' expected near end of file" "<string>"
-                        1 0 0)
-                      :raw "HTTP/1.1 432 Fake\nHeader: Value\n\n"
-                      :success nil))
+                       :status 432
+                       :headers '((header . "Value"))
+                       :body nil
+                       :session "default"
+                       :error
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
+                         1 0 0)
+                       :raw "HTTP/1.1 432 Fake\nHeader: Value\n\n"
+                       :success nil))
              (status . (:error (error http 432)))))
            (:status "HTTP/1.1 432 Fake\n" :headers "Header: Value\n" :body "-"
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 432
-                      :headers '((header . "Value"))
-                      :body nil
-                      :session "default"
-                      :error
-                      '(json-parse-error
-                        "'[' or '{' expected near '-'" "<string>"
-                        1 1 1)
-                      :raw "HTTP/1.1 432 Fake\nHeader: Value\n\n-"
-                      :success nil))
+                       :status 432
+                       :headers '((header . "Value"))
+                       :body nil
+                       :session "default"
+                       :error
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
+                       :raw "HTTP/1.1 432 Fake\nHeader: Value\n\n-"
+                       :success nil))
              (status . (:error (error http 432)))))
            (:status "HTTP/1.1 432 Fake\n"
             :headers "Header: Value\n" :body "{\"a\":\"b\"}"
@@ -834,9 +889,12 @@
                        :body nil
                        :session "default"
                        :error
-                       '(json-end-of-file
-                        "'[' or '{' expected near end of file" "<string>"
-                        1 0 0)
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
+                         1 0 0)
                        :raw "HTTP/1.1 234 Fake\n\n"
                        :success nil))
              (status)))
@@ -844,85 +902,95 @@
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 234
-                      :headers nil
-                      :body nil
-                      :session "default"
-                      :error
-                      '(json-parse-error
-                        "'[' or '{' expected near '-'" "<string>"
-                        1 1 1)
-                      :raw "HTTP/1.1 234 Fake\n\n-"
-                      :success nil))
+                       :status 234
+                       :headers nil
+                       :body nil
+                       :session "default"
+                       :error
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
+                       :raw "HTTP/1.1 234 Fake\n\n-"
+                       :success nil))
              (status)))
            (:status "HTTP/1.1 234 Fake\n" :headers "" :body "{\"a\":\"b\"}"
             :success
             ((resp . ,(make-imgur-response
-                      :status 234
-                      :headers nil
-                      :body '((a . "b"))
-                      :session "default"
-                      :error nil
-                      :raw "HTTP/1.1 234 Fake\n\n{\"a\":\"b\"}"
-                      :success t))
+                       :status 234
+                       :headers nil
+                       :body '((a . "b"))
+                       :session "default"
+                       :error nil
+                       :raw "HTTP/1.1 234 Fake\n\n{\"a\":\"b\"}"
+                       :success t))
              (status))
             :failed nil)
            (:status "HTTP/1.1 234 Fake\n" :headers "-\n" :body ""
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 234
-                      :headers nil
-                      :body nil
-                      :session "default"
-                      :error
-                      '(json-end-of-file
-                        "'[' or '{' expected near end of file" "<string>"
-                        1 0 0)
-                      :raw "HTTP/1.1 234 Fake\n-\n\n"
-                      :success nil))
+                       :status 234
+                       :headers nil
+                       :body nil
+                       :session "default"
+                       :error
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
+                         1 0 0)
+                       :raw "HTTP/1.1 234 Fake\n-\n\n"
+                       :success nil))
              (status)))
            (:status "HTTP/1.1 234 Fake\n" :headers "-\n" :body "-"
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 234
-                      :headers nil
-                      :body nil
-                      :session "default"
-                      :error
-                      '(json-parse-error
-                        "'[' or '{' expected near '-'" "<string>"
-                        1 1 1)
-                      :raw "HTTP/1.1 234 Fake\n-\n\n-"
-                      :success nil))
+                       :status 234
+                       :headers nil
+                       :body nil
+                       :session "default"
+                       :error
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
+                       :raw "HTTP/1.1 234 Fake\n-\n\n-"
+                       :success nil))
              (status)))
            (:status "HTTP/1.1 234 Fake\n" :headers "-\n" :body "{\"a\":\"b\"}"
             :success
             ((resp . ,(make-imgur-response
-                      :status 234
-                      :headers nil
-                      :body '((a . "b"))
-                      :session "default"
-                      :error nil
-                      :raw "HTTP/1.1 234 Fake\n-\n\n{\"a\":\"b\"}"
-                      :success t))
+                       :status 234
+                       :headers nil
+                       :body '((a . "b"))
+                       :session "default"
+                       :error nil
+                       :raw "HTTP/1.1 234 Fake\n-\n\n{\"a\":\"b\"}"
+                       :success t))
              (status))
             :failed nil)
            (:status "HTTP/1.1 234 Fake\n" :headers "Header: Value\n" :body ""
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 234
-                      :headers '((header . "Value"))
-                      :body nil
-                      :session "default"
-                      :error
-                      '(json-end-of-file
-                        "'[' or '{' expected near end of file" "<string>"
-                        1 0 0)
-                      :raw "HTTP/1.1 234 Fake\nHeader: Value\n\n"
-                      :success nil))
+                       :status 234
+                       :headers '((header . "Value"))
+                       :body nil
+                       :session "default"
+                       :error
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
+                         1 0 0)
+                       :raw "HTTP/1.1 234 Fake\nHeader: Value\n\n"
+                       :success nil))
              (status)))
            (:status "HTTP/1.1 234 Fake\n" :headers "Header: Value\n" :body "-"
             :success nil
@@ -933,23 +1001,25 @@
                        :body nil
                        :session "default"
                        :error
-                       '(json-parse-error
-                         "'[' or '{' expected near '-'" "<string>"
-                         1 1 1)
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
                        :raw "HTTP/1.1 234 Fake\nHeader: Value\n\n-"
                        :success nil))
              (status)))
            (:status "HTTP/1.1 234 Fake\n" :headers "Header: Value\n"
             :body "{\"a\":\"b\"}"
             :success
-            ((resp .,(make-imgur-response
-                      :status 234
-                      :headers '((header . "Value"))
-                      :body '((a . "b"))
-                      :raw "HTTP/1.1 234 Fake\nHeader: Value\n\n{\"a\":\"b\"}"
-                      :session "default"
-                      :error nil
-                      :success t))
+            ((resp . ,(make-imgur-response
+                       :status 234
+                       :headers '((header . "Value"))
+                       :body '((a . "b"))
+                       :raw "HTTP/1.1 234 Fake\nHeader: Value\n\n{\"a\":\"b\"}"
+                       :session "default"
+                       :error nil
+                       :success t))
              (status))
             :failed nil)
            (:status "HTTP/1.1 234 Fake\n"
@@ -957,17 +1027,20 @@
             :success nil
             :failed
             ((resp . ,(make-imgur-response
-                      :status 234
-                      :headers '((header . "Value") (header2 . "Value2"))
-                      :body nil
-                      :session "default"
-                      :error
-                      '(json-end-of-file
-                        "'[' or '{' expected near end of file" "<string>"
-                        1 0 0)
-                      :raw
-                      "HTTP/1.1 234 Fake\nHeader: Value\nHeader2: Value2\n\n"
-                      :success nil))
+                       :status 234
+                       :headers '((header . "Value") (header2 . "Value2"))
+                       :body nil
+                       :session "default"
+                       :error
+                       `(json-end-of-file
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near end of file")
+                                (t "unexpected token near end of file"))
+                         "<string>"
+                         1 0 0)
+                       :raw
+                       "HTTP/1.1 234 Fake\nHeader: Value\nHeader2: Value2\n\n"
+                       :success nil))
              (status)))
            (:status "HTTP/1.1 234 Fake\n"
             :headers "Header: Value\nHeader2: Value2\n" :body "-"
@@ -979,9 +1052,11 @@
                        :body nil
                        :session "default"
                        :error
-                       '(json-parse-error
-                         "'[' or '{' expected near '-'" "<string>"
-                         1 1 1)
+                       `(json-parse-error
+                         ,(cond ((= 27 emacs-major-version)
+                                 "'[' or '{' expected near '-'")
+                                (t "invalid token near '-'"))
+                         "<string>" 1 1 1)
                        :raw
                        "HTTP/1.1 234 Fake\nHeader: Value\nHeader2: Value2\n\n-"
                        :success nil))
@@ -990,17 +1065,17 @@
             :headers "Header: Value\nHeader2: Value2\n"
             :body "{\"a\":\"b\"}"
             :success
-            ((resp .,(make-imgur-response
-                      :status 234
-                      :headers '((header . "Value") (header2 . "Value2"))
-                      :body '((a . "b"))
-                      :raw
-                      (concat
-                       "HTTP/1.1 234 Fake\nHeader: Value\nHeader2: Value2\n\n"
-                       "{\"a\":\"b\"}")
-                      :session "default"
-                      :error nil
-                      :success t))
+            ((resp . ,(make-imgur-response
+                       :status 234
+                       :headers '((header . "Value") (header2 . "Value2"))
+                       :body '((a . "b"))
+                       :raw
+                       (concat
+                        "HTTP/1.1 234 Fake\nHeader: Value\nHeader2: Value2\n\n"
+                        "{\"a\":\"b\"}")
+                       :session "default"
+                       :error nil
+                       :success t))
              (status))
             :failed nil))))
     (dolist (item matrix)
@@ -1050,9 +1125,12 @@
               (should (string= (format "%S" failed)
                                (format "%S" (plist-get item :failed))))
               (should (string= (format "%S" success)
-                               (format "%S" (plist-get item :success)))))
+                               (format "%S" (plist-get item :success))))
+              (setq matrix-item-success t))
           (delete-process dummy-server)
-          (advice-remove 'message (lambda (&rest _))))))))
+          (advice-remove 'message (lambda (&rest _)))
+          (if matrix-item-success (setq matrix-item-success nil)
+            (message "Last matrix item: %s" counter)))))))
 
 (provide 'imgur-tests)
 
