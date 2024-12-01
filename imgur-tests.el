@@ -67,18 +67,23 @@
 
 (ert-deftest imgur-authorize-noninteractive-run-server ()
   "Run server without asking when `noninteractive' and `imgur-creds' is nil."
-  (let (imgur-creds imgur-procs (noninteractive t) result called)
+  (let (imgur-creds imgur-procs (noninteractive t)
+                    result called browser-opened)
     (unwind-protect
         (progn
           (advice-add 'make-network-process
                       :override (lambda (&rest r) (setq called t)))
+          (advice-add 'browse-url
+                      :override (lambda (&rest r) (setq browser-opened t)))
           (imgur-authorize "base" "id" "secret"
                            :success (lambda () (setq result "abc")))
-          (should called)
+          (should (and called browser-opened))
           (should-not imgur-creds)
           (should-not result))
       (advice-remove 'make-network-process
-                     (lambda (&rest r) (setq called t))))))
+                     (lambda (&rest r) (setq called t)))
+      (advice-remove 'browse-url
+                     (lambda (&rest r) (setq browser-opened t))))))
 
 (ert-deftest imgur-authorize-interactive-run-server ()
   "Ask to open authorization page (and run server) when `imgur-creds' is nil."
