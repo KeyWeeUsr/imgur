@@ -305,6 +305,8 @@
 
 (ert-deftest imgur-upload-against-http-text-unsupported-status ()
   "Try against server responding with an invalid HTTP code."
+  (when (>= emacs-major-version 30)
+    (ert-skip "Can't catch 'error in process sentinel' on 30+?"))
   (call-interactively 'imgur-reset)
   (let* ((host "127.0.0.1")
          (port 8003)
@@ -365,12 +367,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "\n"
                        :status 0
                        :headers nil
@@ -383,11 +388,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "\n-"
                        :status 0
                        :headers nil
@@ -412,12 +421,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "-\n\n"
                        :status 0
                        :headers nil
@@ -430,11 +442,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "-\n\n-"
                        :status 0
                        :headers nil
@@ -459,12 +475,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "Header: Value\n\n"
                        :status 0
                        :headers nil
@@ -477,11 +496,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "Header: Value\n\n-"
                        :status 0
                        :headers nil
@@ -506,12 +529,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "-\n\n"
                        :status 0
                        :headers nil
@@ -524,11 +550,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "-\n\n-"
                        :status 0
                        :headers nil
@@ -553,12 +583,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "-\n-\n\n"
                        :status 0
                        :headers nil
@@ -571,11 +604,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "-\n-\n\n-"
                        :status 0
                        :headers nil
@@ -600,12 +637,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "-\nHeader: Value\n\n"
                        :status 0
                        :headers '((header . "Value"))
@@ -618,12 +658,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "-\nHeader: Value\nHeader: Value2\n\n"
                        :status 0
                        :headers '((header . "Value2"))
@@ -636,12 +679,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "-\nHeader: Value\nHeader2: Value2\n\n"
                        :status 0
                        :headers '((header . "Value") (header2 . "Value2"))
@@ -654,11 +700,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "-\nHeader: Value\n\n-"
                        :status 0
                        :headers '((header . "Value"))
@@ -671,11 +721,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "-\nHeader: Value\nHeader: Value2\n\n-"
                        :status 0
                        :headers '((header . "Value2"))
@@ -688,11 +742,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "-\nHeader: Value\nHeader2: Value2\n\n-"
                        :status 0
                        :headers '((header . "Value") (header2 . "Value2"))
@@ -744,12 +802,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "HTTP/1.1 432 Fake\n\n"
                        :status 432
                        :headers nil
@@ -762,11 +823,15 @@
             ((resp . ,(make-imgur-response
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "HTTP/1.1 432 Fake\n\n-"
                        :status 432
                        :headers nil
@@ -794,12 +859,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "HTTP/1.1 432 Fake\n-\n\n"
                        :success nil))
              (status . (:error (error http 432)))))
@@ -812,11 +880,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "HTTP/1.1 432 Fake\n-\n\n-"
                        :success nil))
              (status . (:error (error http 432)))))
@@ -841,12 +913,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "HTTP/1.1 432 Fake\nHeader: Value\n\n"
                        :success nil))
              (status . (:error (error http 432)))))
@@ -859,11 +934,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "HTTP/1.1 432 Fake\nHeader: Value\n\n-"
                        :success nil))
              (status . (:error (error http 432)))))
@@ -889,12 +968,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "HTTP/1.1 234 Fake\n\n"
                        :success nil))
              (status)))
@@ -907,11 +989,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "HTTP/1.1 234 Fake\n\n-"
                        :success nil))
              (status)))
@@ -936,12 +1022,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "HTTP/1.1 234 Fake\n-\n\n"
                        :success nil))
              (status)))
@@ -954,11 +1043,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "HTTP/1.1 234 Fake\n-\n\n-"
                        :success nil))
              (status)))
@@ -983,12 +1076,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw "HTTP/1.1 234 Fake\nHeader: Value\n\n"
                        :success nil))
              (status)))
@@ -1001,11 +1097,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw "HTTP/1.1 234 Fake\nHeader: Value\n\n-"
                        :success nil))
              (status)))
@@ -1032,12 +1132,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-end-of-file
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near end of file")
-                                (t "unexpected token near end of file"))
-                         "<string>"
-                         1 0 0)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-end-of-file
+                                "'[' or '{' expected near end of file"
+                                "<string>" 1 0 0))
+                             ((and (> emacs-major-version 29))
+                              '(json-end-of-file 1 0 0))
+                             (t '(json-end-of-file
+                                  "unexpected token near end of file"
+                                  "<string>" 1 0 0)))
                        :raw
                        "HTTP/1.1 234 Fake\nHeader: Value\nHeader2: Value2\n\n"
                        :success nil))
@@ -1052,11 +1155,15 @@
                        :body nil
                        :session "default"
                        :error
-                       `(json-parse-error
-                         ,(cond ((= 27 emacs-major-version)
-                                 "'[' or '{' expected near '-'")
-                                (t "invalid token near '-'"))
-                         "<string>" 1 1 1)
+                       (cond ((= 27 emacs-major-version)
+                              '(json-parse-error
+                                "'[' or '{' expected near '-'"
+                                "<string>" 1 1 1))
+                             ((> emacs-major-version 29)
+                              '(json-end-of-file 1 1 1))
+                             (t '(json-parse-error
+                                  "invalid token near '-'"
+                                  "<string>" 1 1 1)))
                        :raw
                        "HTTP/1.1 234 Fake\nHeader: Value\nHeader2: Value2\n\n-"
                        :success nil))
